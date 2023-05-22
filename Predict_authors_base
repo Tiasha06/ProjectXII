@@ -1,0 +1,74 @@
+import math
+
+#ln_prob Function: Takes the reference file, reads it and finds the number of words in it.
+#          Takes the dictionary with the count occurences of unique words in the sample text file.
+#          If the word in sample text exists in the dict, probability of the words being in ref file
+#          is calculated. Returns the summation of ln of probabilities.
+
+def ln_prob(file, wordlist):
+    data = file.read()
+    #print(data)
+    sum = 0 #initialises sum to zero
+    list = data.split()
+    wordcount = 0
+    for i in wordlist.values():
+        wordcount = wordcount + i
+    print(wordcount)
+    for words in list:
+        if words in wordlist:
+            x = wordlist.get(words)
+            prob = x/wordcount
+            sum = sum + math.log(prob, math.e)
+
+    return sum
+
+#function to calculate count occurences of each words and stored in dict
+#returns dictionary
+
+def author_dict():
+    book = dict()   #empty dict
+    try:
+        filename = input("Enter reference file path: ")   #input for reference file for comparison
+        openbook = open(filename, "rt")    #opens ref file in read mode
+        for line in openbook:
+            for word in line.split():
+                if word in book:
+                    book[word] = book[word] + 1
+                else:
+                    book[word] = 1
+        openbook.close()
+
+    except IOError as e:
+        print (e)
+    return book
+
+#Main program start
+
+#Sample sentence
+sample = input("Enter path of the sample file to be analysed: ")
+while ('y' == input("Want to match an author? y/n: ")): #if we wish to continue finding probability:
+                                                        #input y
+    try:
+        s_author = input("Name of author: ")  #input name of author
+        file = open(sample, "rt")
+        compare_dict = dict()
+        compare_dict = author_dict()
+        print (f'Probability of sample being written by {s_author}', ln_prob(file, compare_dict))
+        file.close()
+    except IOError as e:
+        print(e)
+
+
+#print(wordList_M1)
+#print(wordList_M2)
+
+
+#outputfile = input("Enter output file path:")
+#f = open(outputfile, "w")
+
+#for word, freq in wordList.items():
+    #oline = "%s : %s \n" % (word,freq)
+    #print(oline)
+    #f.write(oline)
+
+#f.close()
