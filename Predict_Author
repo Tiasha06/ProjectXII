@@ -1,0 +1,129 @@
+import math
+
+#define all Macros here
+
+DELTA = 0.0001
+REF_FILE1 = "C:\\tiashapython\emily1800.txt"
+REF_FILE2 = "C:\\tiashapython\Eliot1900.txt"
+REF_FILE3 = "C:\\tiashapython\/robert1900.txt"
+
+
+#ln_prob Function: Takes the reference file, reads it and finds the number of words in it.
+#          Takes the dictionary with the count occurences of unique words in the sample text file.
+#          If the word in sample text exists in the dict, probability of the words being in ref file
+#          is calculated. Returns the summation of ln of probabilities.
+
+def ln_prob(file, wordlist, auth):
+    data = file.read()
+    #print(data)
+    sum = 0 #initialises sum of 3 array to zero
+    list = data.split()
+    wordcount = len(wordlist)
+    print(wordcount)
+
+    for words in list:
+        if words in wordlist:
+            x = wordlist.get(words)[auth]
+            print(x)
+            prob = x/wordcount
+            sum = sum + math.log(prob, math.e)
+
+    return sum
+
+
+#function to calculate count occurences of each words and stored in dict
+#returns dictionary
+
+def author_dict():
+    book1 = dict() #empty dict
+    book2 = dict()
+    book3 = dict()
+    try:
+        #filename1 = input("Enter reference file path 1: ") #input for reference file for comparison
+        #filename2 = input("Enter reference file path 2: ")
+        #filename3 = input("Enter reference file path 3: ")
+        filename1 = REF_FILE1
+        filename2 = REF_FILE2
+        filename3 = REF_FILE3
+        openbook = open(filename1, "rt")    #opens ref file in read mode
+        for line in openbook:
+            for word in line.split():
+                if word in book1:
+                    book1[word] = book1[word] + 1
+                else:
+                    book1[word] = 1
+
+        openbook.close()
+
+        openbook = open(filename2, "rt")
+        for line in openbook:
+            for word in line.split():
+                if word in book2:
+                    book2[word] = book2[word] + 1
+                else:
+                    book2[word] = 1
+        openbook.close()
+
+        openbook = open(filename3, "rt")
+        for line in openbook:
+            for word in line.split():
+                if word in book3:
+                    book3[word] = book3[word] + 1
+                else:
+                    book3[word] = 1
+        openbook.close()
+
+        book = {**book1, **book2, **book3}
+        for key, value in book.items():
+            if key in book1 and key not in book2 and key not in book3:
+                book[key] = [book1[key], DELTA, DELTA]
+            elif key not in book1 and key in book2 and key not in book3:
+                book[key] = [DELTA, book2[key], DELTA]
+            elif key not in book1 and key not in book2 and key in book3:
+                book[key] = [DELTA, DELTA, book3[key]]
+            elif key in book1 and key in book2 and key not in book3:
+                book[key] = [book1[key], book2[key], DELTA]
+            elif key in book1 and key not in book2 and key in book3:
+                book[key] = [book1[key], DELTA, book3[key]]
+            elif key not in book1 and key in book2 and key in book3:
+                book[key] = [DELTA, book2[key], book3[key]]
+            else:
+                book[key] = [book1[key], book2[key], value]
+        return book
+    except IOError as e:
+        print (e)
+
+
+#Main program start
+
+#Sample sentence
+sample = input("Enter path of the sample file to be analysed: ")
+try:
+      #input name of author
+    #compare_dict = dict()
+    compare_dict = author_dict()
+    i = 0
+    while i <= 2:
+        s_author = input("Name of authors: ")
+        file = open(sample, "rt")
+        book_ln = ln_prob(file, compare_dict, i)
+        print (f'Probability of sample being written by {s_author}', book_ln)
+        i = i + 1
+        file.close()
+except IOError as e:
+    print(e)
+
+
+#print(wordList_M1)
+#print(wordList_M2)
+
+
+#outputfile = input("Enter output file path:")
+#f = open(outputfile, "w")
+
+#for word, freq in wordList.items():
+#oline = "%s : %s \n" % (word,freq)
+#print(oline)
+#f.write(oline)
+
+#f.close()
