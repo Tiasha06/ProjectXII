@@ -1,0 +1,57 @@
+import random
+import os
+
+REF_JANE = "C:\\tiashapython\\Original\\janeausten.txt"
+REF_HARDY = "C:\\tiashapython\\Original\\thomashardy.txt"
+NEW_JANE = "C:\\tiashapython\\janeref.txt"
+SAM_JANE = "C:\\tiashapython\\janesample.txt"
+NEW_HARDY = "C:\\tiashapython\\hardyref.txt"
+SAM_HARDY = "C:\\tiashapython\\hardysample.txt"
+SAM_CNT = 100
+MIN_SZ = 100
+MIN_R = 10
+MAX_R = 2
+
+def samples(og_file, new_file, sam_file):
+
+    with open(og_file, 'rt') as ref_of:
+        cnt = 0
+
+        for line in ref_of:
+            cnt += 1
+            block = int(cnt/SAM_CNT)
+        print(block)
+        print(cnt)
+    ref_of.close()
+
+    if block < MIN_SZ:
+        print("Block size is too small, increase reference file")
+        exit
+
+    sam_sz = random.randint(MIN_SZ/MIN_R, MIN_SZ/MAX_R)
+    print("Sample lines",sam_sz)
+
+    if os.path.exists(new_file) and os.path.exists(sam_file):
+        os.remove(new_file)
+        os.remove(sam_file)
+
+    try:
+        with open(og_file, 'rt') as ref_of, open(new_file, 'at') as ref_nf, open(sam_file, 'at') as sam_nf:
+        #for line in ref_of:
+            while True:
+                i = 1
+                while i <= sam_sz:
+                    sam_nf.write(ref_of.readline())
+                    i = i + 1
+                sam_nf.write("\nsampletext\n")
+                while i <= block:
+                    ref_nf.write(ref_of.readline())
+                    i = i + 1
+
+    except IOError as e:
+        print(e)
+
+#main
+
+samples(REF_HARDY, NEW_HARDY, SAM_HARDY)
+samples(REF_JANE, NEW_JANE, SAM_JANE)
